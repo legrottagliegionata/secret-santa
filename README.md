@@ -23,8 +23,9 @@ Scarica l'app per il tuo sistema e aprila con un doppio clic: si apre la pagina 
 
 - **Mac** (macOS 13 o successivo, Intel e Apple Silicon): finché è aperta l'app ha l'icona nel Dock. Un clic sull'icona riapre la pagina; **Esci** (o ⌘Q) la chiude.
 - **Windows** (64 bit): `SecretSanta.exe`.
+- **Linux** (amd64 o arm64): estrai l'archivio nella cartella dove vuoi tenerla e lancia una volta `./installa.sh` per aggiungere Secret Santa al menu delle applicazioni, con l'icona. In alternativa avvialo con `./secret-santa`.
 
-In entrambi i casi il pulsante **⏻ Chiudi Secret Santa** nella pagina salva e chiude l'app, che comunque si chiude da sola poco dopo aver chiuso la scheda.
+In tutti i casi il pulsante **⏻ Chiudi Secret Santa** nella pagina salva e chiude l'app, che comunque si chiude da sola poco dopo aver chiuso la scheda.
 
 Mettila in una cartella tutta sua (per esempio `Documenti/Secret Santa`): il file dei dati viene creato accanto all'app.
 
@@ -44,11 +45,11 @@ Le app non sono firmate da uno sviluppatore registrato, quindi il sistema chiede
 Serve un Mac con [Go](https://go.dev) 1.25+ e gli strumenti da riga di comando di Xcode (per Swift, `lipo`, `iconutil`, `codesign`).
 
 ```bash
-./app/build.sh            # compila Mac e Windows in dist/
+./app/build.sh            # compila Mac, Windows e Linux in dist/
 ./app/build.sh --icone    # ridisegna anche le icone da app/icona/disegna.swift
 ```
 
-Risultati in `dist/`: `Secret Santa - Mac.zip` e `Secret Santa - Windows.zip`.
+Risultati in `dist/`: `Secret Santa - Mac.zip`, `Secret Santa - Windows.zip`, `Secret Santa - Linux amd64.tar.gz` e `Secret Santa - Linux arm64.tar.gz`.
 
 ## Com'è fatto
 
@@ -57,5 +58,6 @@ Risultati in `dist/`: `Secret Santa - Mac.zip` e `Secret Santa - Windows.zip`.
 | `index.html` | Tutta l'interfaccia e il sorteggio, in un solo file HTML/JS senza dipendenze. |
 | `app/main.go` | Programma Go (solo libreria standard) che incorpora la pagina, la serve su `127.0.0.1`, apre il browser e salva i dati nel file JSON. Accetta solo richieste locali. |
 | `app/mac/Lanciatore.swift` | Lanciatore macOS: icona nel Dock, riapertura della pagina, **Esci**. |
+| `app/linux/installa.sh` | Aggiunge Secret Santa al menu delle applicazioni su Linux (file `.desktop` dell'utente). |
 | `app/icona/disegna.swift` | Disegna l'icona; `build.sh` ne ricava `.icns` per Mac e le risorse per Windows. |
 | `app/strumenti/winicon` | Piccolo generatore del file `.syso` che incorpora l'icona nell'eseguibile Windows. |

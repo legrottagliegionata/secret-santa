@@ -323,5 +323,16 @@ func mostraErrore(msg string) {
 		exec.Command("powershell", "-NoProfile", "-WindowStyle", "Hidden", "-Command", ps).Run()
 	default:
 		fmt.Fprintln(os.Stderr, msg)
+		// avviato dal menu delle applicazioni non c'è un terminale: provo con le finestre del desktop
+		for _, c := range [][]string{
+			{"zenity", "--error", "--title=Secret Santa", "--text=" + msg},
+			{"kdialog", "--title", "Secret Santa", "--error", msg},
+			{"notify-send", "Secret Santa", msg},
+		} {
+			if _, err := exec.LookPath(c[0]); err == nil {
+				exec.Command(c[0], c[1:]...).Run()
+				return
+			}
+		}
 	}
 }

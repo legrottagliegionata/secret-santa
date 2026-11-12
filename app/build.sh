@@ -1,5 +1,5 @@
 #!/bin/bash
-# Compila Secret Santa per Mac (app universale Intel + Apple Silicon) e Windows (64 bit).
+# Compila Secret Santa per Mac (app universale Intel + Apple Silicon), Windows (64 bit) e Linux (amd64, arm64).
 # Uso: ./build.sh   → risultati in ../dist
 # Per ridisegnare l'icona: ./build.sh --icone
 set -euo pipefail
@@ -41,6 +41,18 @@ trap 'rm -rf "$TMP"' EXIT
 echo "→ Windows"
 GOOS=windows GOARCH=amd64 go build -trimpath -ldflags "$LDFLAGS -H windowsgui" -o "$DIST/windows/SecretSanta.exe" .
 
+echo "→ Linux"
+for arch in amd64 arm64; do
+  L="$DIST/linux-$arch/Secret Santa"
+  mkdir -p "$L"
+  GOOS=linux GOARCH=$arch go build -trimpath -ldflags "$LDFLAGS" -o "$L/secret-santa" .
+  cp icona/win-256.png "$L/secret-santa.png"
+  cp linux/installa.sh linux/LEGGIMI.txt "$L/"
+  chmod +x "$L/secret-santa" "$L/installa.sh"
+  # niente metadati macOS dentro l'archivio
+  (cd "$DIST/linux-$arch" && COPYFILE_DISABLE=1 tar --no-mac-metadata --no-xattrs --no-acls --no-fflags --uid 0 --gid 0 -czf "../Secret Santa - Linux $arch.tar.gz" "Secret Santa")
+done
+
 echo "→ Mac: programma"
 GOOS=darwin GOARCH=arm64 go build -trimpath -ldflags "$LDFLAGS" -o "$TMP/server-arm64" .
 GOOS=darwin GOARCH=amd64 go build -trimpath -ldflags "$LDFLAGS" -o "$TMP/server-amd64" .
@@ -79,4 +91,4 @@ echo "→ Zip da condividere"
 (cd "$DIST/mac" && ditto -c -k --keepParent "Secret Santa.app" "../Secret Santa - Mac.zip")
 (cd "$DIST/windows" && zip -q -j "../Secret Santa - Windows.zip" SecretSanta.exe)
 
-ls -lh "$DIST" "$DIST/windows" "$APP/Contents/MacOS"
+ls -lh "$DIST"

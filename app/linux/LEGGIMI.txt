@@ -1,0 +1,19 @@
+SECRET SANTA DI FAMIGLIA - versione Linux
+=========================================
+
+1. Metti questa cartella dove vuoi tenerla, per esempio ~/Documenti/Secret Santa
+   (i dati della famiglia vengono salvati qui dentro, in secret-santa-dati.json).
+
+2. Apri un terminale in questa cartella e lancia una volta:
+
+       ./installa.sh
+
+   Da quel momento trovi "Secret Santa" nel menu delle applicazioni, con l'icona.
+
+   In alternativa puoi avviarlo direttamente con:  ./secret-santa
+
+3. L'app apre la pagina nel browser predefinito. Per chiuderla usa il pulsante
+   "Chiudi Secret Santa" in alto nella pagina; si chiude comunque da sola poco
+   dopo che hai chiuso la scheda.
+
+Per togliere Secret Santa dal menu:  ./installa.sh --rimuovi
