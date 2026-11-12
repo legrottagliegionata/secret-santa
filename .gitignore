@@ -1,0 +1,14 @@
+# build
+dist/
+app/web/
+
+# dati e log creati dall'app (contengono i nomi della famiglia)
+secret-santa-dati*.json
+secret-santa-backup-*.json
+*.log
+*.tmp
+
+# vecchie versioni locali
+index-v1-riserva.html
+
+.DS_Store

@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Secret Santa di famiglia</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<style>
+  :root {
+    --bg: #faf7f2; --card: #fff; --ink: #2b2b2b; --muted: #777;
+    --red: #b3261e; --green: #2e6b3f; --line: #e6e0d6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: var(--bg); color: var(--ink); }
+  header { background: var(--red); color: #fff; padding: 20px 24px; }
+  header h1 { margin: 0; font-size: 24px; }
+  header p { margin: 4px 0 0; opacity: .9; font-size: 14px; }
+  main { max-width: 1000px; margin: 0 auto; padding: 20px; }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin-bottom: 18px; }
+  h2 { margin: 0 0 12px; font-size: 18px; color: var(--green); }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); font-size: 14px; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .03em; }
+  input[type=text], select { width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 14px; background: #fff; }
+  .nucleo { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; }
+  .nucleo-head { display: flex; gap: 8px; align-items: center; margin-bottom: 6px; }
+  .nucleo-head input { font-weight: 600; max-width: 320px; }
+  .count { color: var(--muted); font-size: 13px; margin-left: auto; }
+  button { cursor: pointer; border: 1px solid var(--line); background: #fff; border-radius: 6px; padding: 6px 12px; font-size: 14px; }
+  button:hover { background: #f3efe8; }
+  button.primary { background: var(--green); color: #fff; border-color: var(--green); font-weight: 600; padding: 10px 18px; font-size: 15px; }
+  button.primary:hover { background: #255a34; }
+  button.danger { color: var(--red); }
+  button.icon { padding: 4px 8px; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .opts label { display: flex; gap: 8px; align-items: center; font-size: 14px; margin-bottom: 6px; }
+  .err { color: var(--red); font-weight: 600; margin-top: 10px; }
+  .results { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 12px; }
+  .pair { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+  .pair .giver { font-weight: 600; }
+  .pair .small { color: var(--muted); font-size: 12px; }
+  .pair .recv { margin-top: 6px; font-size: 16px; color: var(--red); font-weight: 600; }
+  .pair .hidden { color: var(--muted); font-style: italic; font-weight: normal; }
+  .muted { color: var(--muted); font-size: 13px; }
+  @media print { header button, .noprint { display: none !important; } section { border: none; } }
+</style>
+</head>
+<body>
+<header style="display:flex; align-items:center; gap:16px">
+  <div style="flex:1">
+    <h1>🎄 Secret Santa di famiglia</h1>
+    <p>Inserisci fratelli e sorelle con coniugi e figli, poi estrai gli abbinamenti a caso.</p>
+  </div>
+  <button id="btnChiudiApp" onclick="chiudiApp()" style="display:none; background:rgba(255,255,255,.15); color:#fff; border-color:rgba(255,255,255,.5)"
+          title="Salva e chiude il programma Secret Santa">⏻ Chiudi Secret Santa</button>
+</header>
+<main>
+  <div id="avviso" style="display:none; background:#fde8e6; color:var(--red); border:1px solid var(--red); border-radius:8px; padding:10px 14px; margin-bottom:14px; font-weight:600"></div>
+  <section>
+    <h2>1 · La famiglia</h2>
+    <p class="muted">Ogni <b>nucleo</b> è un fratello o una sorella con il proprio coniuge e i figli.
+      <b>Fa regali</b>: spunta chi partecipa e deve fare i regali; gli altri li ricevono soltanto.
+      <b>Regali da ricevere</b>: quanti regali deve ricevere quella persona (0 = nessuno).</p>
+    <div id="nuclei"></div>
+    <div class="row noprint">
+      <button onclick="addNucleo()">+ Aggiungi nucleo</button>
+      <span class="muted" id="totale"></span>
+    </div>
+    <div class="row noprint" style="margin-top:10px">
+      <button onclick="esporta()">💾 Esporta backup</button>
+      <button onclick="document.getElementById('fileImport').click()">📂 Importa backup</button>
+      <input type="file" id="fileImport" accept=".json,application/json" style="display:none" onchange="importa(this.files[0]); this.value=''">
+      <span class="muted">I dati si salvano da soli in questo browser; il backup è un file da tenere per sicurezza.</span>
+    </div>
+  </section>
+
+  <section class="noprint">
+    <h2>2 · Regole</h2>
+    <div class="opts">
+      <label><input type="checkbox" id="optNucleo" checked onchange="save()"> Non fare regali a chi è nel proprio nucleo (coniuge, figli, genitori)</label>
+      <label>Budget per regalo: <input type="text" id="budget" style="width:120px" placeholder="es. 30 €" oninput="save()"></label>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="primary" onclick="estrai()">🎲 Estrai gli abbinamenti</button>
+    </div>
+    <div class="err" id="err"></div>
+  </section>
+
+  <section id="secRisultati" style="display:none">
+    <h2>3 · Abbinamenti</h2>
+    <p class="muted" id="infoEstrazione"></p>
+    <div class="row noprint">
+      <button onclick="toggleAll(true)">Mostra tutti</button>
+      <button onclick="toggleAll(false)">Nascondi tutti</button>
+      <button onclick="copia()">Copia elenco</button>
+      <button onclick="window.print()">Stampa</button>
+    </div>
+    <div class="results" id="results"></div>
+  </section>
+</main>
+
+<script>
+const RUOLI = ["Fratello/Sorella", "Coniuge", "Figlio/a"];
+const KEY = "secret-santa-famiglia-v1";
+// Aperta dall'app (http://127.0.0.1) i dati stanno nel file JSON accanto all'app; aperta come file, nel browser.
+const APP = location.protocol.startsWith("http");
+let state;
+
+function uid() { return Math.random().toString(36).slice(2, 9); }
+
+function defaultState() {
+  return {
+    nuclei: [
+      { id: uid(), nome: "Nucleo 1", membri: [
+        { id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, regali: 2 },
+      ]},
+      { id: uid(), nome: "Nucleo 2", membri: [
+        { id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, regali: 2 },
+        { id: uid(), nome: "", ruolo: "Coniuge", partecipa: true, regali: 2 },
+        { id: uid(), nome: "", ruolo: "Figlio/a", partecipa: true, regali: 2 },
+      ]},
+    ],
+    escludiNucleo: true, budget: "", risultati: null, dataEstrazione: null,
+  };
+}
+
+// Porta i dati salvati con versioni precedenti della pagina al formato attuale, senza perdere nulla.
+function migra(s) {
+  s.nuclei.forEach(n => n.membri.forEach(m => {
+    if (m.regali === undefined || m.regali === null || isNaN(m.regali)) m.regali = 1;
+    if (m.partecipa === undefined) m.partecipa = true;
+  }));
+  if (s.escludiNucleo === undefined) s.escludiNucleo = true;
+  if (Array.isArray(s.risultati)) {
+    s.risultati.forEach(r => { if (!Array.isArray(r.a)) r.a = r.a ? [r.a] : []; });
+  } else s.risultati = null;
+  return s;
+}
+
+async function leggiRaw() {
+  if (!APP) return localStorage.getItem(KEY);
+  const r = await fetch("/api/dati", { cache: "no-store" });
+  if (r.status === 204) return null;
+  if (!r.ok) throw new Error("lettura dati: HTTP " + r.status);
+  return await r.text();
+}
+
+async function load() {
+  let raw;
+  try { raw = await leggiRaw(); }
+  catch (e) {
+    alert("Non riesco a leggere il file dei dati: " + e.message);
+    window.__datiIllegibili = true;
+    return migra(defaultState());
+  }
+  if (raw) {
+    // copia di sicurezza dei dati così come li trovo (nell'app la fa il programma su file .bak)
+    if (!APP && localStorage.getItem(KEY + "-backup") !== raw) {
+      localStorage.setItem(KEY + "-backup", raw);
+      localStorage.setItem(KEY + "-backup-data", new Date().toISOString());
+    }
+    try { const s = JSON.parse(raw); if (s && Array.isArray(s.nuclei)) return migra(s); } catch (e) {}
+    alert("Non riesco a leggere i dati salvati. Ne ho tenuto una copia: non modificare nulla e chiedi aiuto prima di continuare.");
+    window.__datiIllegibili = true;
+  }
+  return migra(defaultState());
+}
+
+function esporta() {
+  save();
+  const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `secret-santa-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importa(file) {
+  if (!file) return;
+  file.text().then(txt => {
+    let s;
+    try { s = JSON.parse(txt); } catch (e) { alert("Il file non è un backup valido."); return; }
+    if (!s || !Array.isArray(s.nuclei)) { alert("Il file non è un backup del Secret Santa."); return; }
+    if (!confirm("Sostituire i dati attuali con quelli del backup?")) return;
+    state = migra(s); window.__datiIllegibili = false; save(); render();
+  });
+}
+
+function save() {
+  if (window.__datiIllegibili) return; // non sovrascrivere dati che non sono riuscito a leggere
+  state.escludiNucleo = document.getElementById("optNucleo").checked;
+  state.budget = document.getElementById("budget").value;
+  if (APP) salvaSuFile(); else localStorage.setItem(KEY, JSON.stringify(state));
+  aggiornaTotale();
+}
+
+let timerSalva = null;
+function salvaSuFile(subito) {
+  clearTimeout(timerSalva);
+  const invia = () => fetch("/api/dati", { method: "PUT", body: JSON.stringify(state, null, 2), keepalive: true })
+    .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); avviso(""); })
+    .catch(e => avviso("⚠️ Non riesco a salvare: l'app è stata chiusa? Riaprila; le ultime modifiche potrebbero non essere salvate. (" + e.message + ")"));
+  if (subito) invia(); else timerSalva = setTimeout(invia, 300);
+}
+
+function avviso(msg) {
+  const el = document.getElementById("avviso");
+  el.textContent = msg; el.style.display = msg ? "" : "none";
+}
+
+async function chiudiApp() {
+  if (!confirm("Chiudere Secret Santa? I dati sono già salvati.")) return;
+  clearTimeout(timerSalva);
+  try {
+    if (!window.__datiIllegibili) {
+      const r = await fetch("/api/dati", { method: "PUT", body: JSON.stringify(state, null, 2) });
+      if (!r.ok) throw new Error("salvataggio: HTTP " + r.status);
+    }
+    await fetch("/api/esci", { method: "POST", headers: { "X-Secret-Santa": "1" } });
+  } catch (e) {
+    alert("Non sono riuscito a chiudere bene l'app: " + e.message);
+    return;
+  }
+  document.body.innerHTML = `<main style="text-align:center; padding-top:80px">
+    <h1 style="color:var(--green)">🎄 Secret Santa è chiuso</h1>
+    <p class="muted">I dati sono salvati. Puoi chiudere questa scheda.</p></main>`;
+}
+
+if (APP) {
+  document.addEventListener("DOMContentLoaded", () => document.getElementById("btnChiudiApp").style.display = "");
+  // battito: l'app si chiude da sola qualche minuto dopo che la pagina è stata chiusa
+  setInterval(() => fetch("/api/ping", { method: "POST" }).catch(() => {}), 15000);
+  addEventListener("pagehide", () => {
+    if (timerSalva) salvaSuFile(true);
+    navigator.sendBeacon("/api/chiudi");
+  });
+}
+
+function esc(s) { return String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c])); }
+
+function render() {
+  const box = document.getElementById("nuclei");
+  box.innerHTML = state.nuclei.map(n => `
+    <div class="nucleo">
+      <div class="nucleo-head">
+        <input type="text" value="${esc(n.nome)}" placeholder="Nome del nucleo (es. Famiglia di Marco)"
+               oninput="setNucleo('${n.id}', this.value)">
+        <span class="count">${descriviNucleo(n)}</span>
+        <button class="icon danger noprint" title="Elimina nucleo" onclick="delNucleo('${n.id}')">🗑</button>
+      </div>
+      <table>
+        <thead><tr><th style="width:40%">Nome</th><th style="width:25%">Ruolo</th><th>Fa regali</th><th>Regali da ricevere</th><th></th></tr></thead>
+        <tbody>
+          ${n.membri.map(m => `
+            <tr>
+              <td><input type="text" value="${esc(m.nome)}" placeholder="Nome"
+                         oninput="setMembro('${n.id}','${m.id}','nome',this.value)"></td>
+              <td><select onchange="setMembro('${n.id}','${m.id}','ruolo',this.value)">
+                ${RUOLI.map(r => `<option ${r === m.ruolo ? "selected" : ""}>${r}</option>`).join("")}
+              </select></td>
+              <td><input type="checkbox" ${m.partecipa ? "checked" : ""}
+                         onchange="setMembro('${n.id}','${m.id}','partecipa',this.checked)"></td>
+              <td><input type="number" min="0" max="20" step="1" value="${m.regali}" style="width:70px"
+                         oninput="setMembro('${n.id}','${m.id}','regali',Math.max(0, parseInt(this.value) || 0))"></td>
+              <td><button class="icon danger noprint" title="Rimuovi" onclick="delMembro('${n.id}','${m.id}')">✕</button></td>
+            </tr>`).join("")}
+        </tbody>
+      </table>
+      <div class="row noprint" style="margin-top:6px">
+        <button onclick="addMembro('${n.id}','Coniuge')">+ Coniuge</button>
+        <button onclick="addMembro('${n.id}','Figlio/a')">+ Figlio/a</button>
+        <button onclick="addMembro('${n.id}','Fratello/Sorella')">+ Altro</button>
+      </div>
+    </div>`).join("");
+  document.getElementById("optNucleo").checked = state.escludiNucleo;
+  document.getElementById("budget").value = state.budget || "";
+  aggiornaTotale();
+  renderRisultati();
+}
+
+function descriviNucleo(n) {
+  const named = n.membri.filter(m => m.nome.trim());
+  const fanno = named.filter(m => m.partecipa).length;
+  const ricevono = named.reduce((s, m) => s + (m.regali || 0), 0);
+  return `${fanno} fanno regali · ${ricevono} regali da ricevere`;
+}
+
+function aggiornaTotale() {
+  const p = persone();
+  const G = p.filter(x => x.fa).length, S = p.reduce((s, x) => s + x.riceve, 0);
+  let txt = `Totale: ${G} persone fanno regali, ${S} regali da ricevere`;
+  if (G > 0 && S > 0) {
+    const lo = Math.floor(S / G), hi = Math.ceil(S / G);
+    txt += ` → ognuno fa ${lo === hi ? lo : lo + " o " + hi} regal${hi === 1 ? "o" : "i"}`;
+  }
+  document.getElementById("totale").textContent = txt;
+  document.querySelectorAll(".nucleo").forEach((el, i) => {
+    const n = state.nuclei[i];
+    if (n) el.querySelector(".count").textContent = descriviNucleo(n);
+  });
+}
+
+const findN = id => state.nuclei.find(n => n.id === id);
+function setNucleo(id, v) { findN(id).nome = v; save(); }
+function setMembro(nid, mid, k, v) { findN(nid).membri.find(m => m.id === mid)[k] = v; save(); }
+function addNucleo() {
+  state.nuclei.push({ id: uid(), nome: `Nucleo ${state.nuclei.length + 1}`,
+    membri: [{ id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, regali: 2 }] });
+  save(); render();
+}
+function delNucleo(id) {
+  const n = findN(id);
+  if (n.membri.some(m => m.nome.trim()) && !confirm(`Eliminare "${n.nome}" e tutti i suoi membri?`)) return;
+  state.nuclei = state.nuclei.filter(x => x.id !== id); save(); render();
+}
+function addMembro(nid, ruolo) { findN(nid).membri.push({ id: uid(), nome: "", ruolo, partecipa: true, regali: 2 }); save(); render(); }
+function delMembro(nid, mid) { const n = findN(nid); n.membri = n.membri.filter(m => m.id !== mid); save(); render(); }
+
+function persone() {
+  const out = [];
+  state.nuclei.forEach(n => n.membri.forEach(m => {
+    if (m.nome.trim()) out.push({ nome: m.nome.trim(), nucleo: n.id, nucleoNome: n.nome,
+                                  fa: !!m.partecipa, riceve: Math.max(0, parseInt(m.regali) || 0) });
+  }));
+  return out;
+}
+
+function rnd(n) { return crypto.getRandomValues(new Uint32Array(1))[0] % n; }
+
+function shuffle(a) {
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = rnd(i + 1);
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Ogni regalo da ricevere è uno "slot". I regali sono divisi il più equamente possibile tra chi li fa:
+// nessuno fa un regalo a sé stesso, nessuno fa due regali alla stessa persona e, se richiesto,
+// nessuno fa regali al proprio nucleo. Ritorna una lista [giver, receiver] oppure null.
+function sorteggia(pers, escludiNucleo) {
+  const givers = pers.map((_, i) => i).filter(i => pers[i].fa);
+  const ok = (g, r) => g !== r && !(escludiNucleo && pers[g].nucleo === pers[r].nucleo);
+  const S = pers.reduce((s, x) => s + x.riceve, 0), G = givers.length;
+  const eleggibili = r => givers.filter(g => ok(g, r)).length;
+
+  for (let tentativo = 0; tentativo < 30; tentativo++) {
+    // capacità: tutti fanno floor(S/G) regali, alcuni a caso uno in più
+    const cap = new Array(pers.length).fill(0);
+    givers.forEach(g => cap[g] = Math.floor(S / G));
+    shuffle([...givers]).slice(0, S % G).forEach(g => cap[g]++);
+
+    // slot ordinati dal destinatario più vincolato, a parità in ordine casuale
+    const slots = [];
+    shuffle(pers.map((_, i) => i))
+      .sort((a, b) => eleggibili(a) - eleggibili(b))
+      .forEach(r => { for (let k = 0; k < pers[r].riceve; k++) slots.push(r); });
+
+    const dato = new Set(), coppie = [];
+    let passi = 0;
+    const bt = k => {
+      if (k === slots.length) return true;
+      if (++passi > 50000) return false;
+      const r = slots[k];
+      for (const g of shuffle([...givers])) {
+        if (cap[g] > 0 && ok(g, r) && !dato.has(g + ">" + r)) {
+          cap[g]--; dato.add(g + ">" + r); coppie.push([g, r]);
+          if (bt(k + 1)) return true;
+          cap[g]++; dato.delete(g + ">" + r); coppie.pop();
+        }
+      }
+      return false;
+    };
+    if (bt(0)) return coppie;
+  }
+  return null;
+}
+
+function estrai() {
+  save();
+  const err = document.getElementById("err");
+  err.textContent = "";
+  const p = persone();
+  const givers = p.filter(x => x.fa);
+  const S = p.reduce((s, x) => s + x.riceve, 0);
+  if (givers.length < 2) { err.textContent = "Servono almeno 2 persone che fanno regali (spunta \"Fa regali\")."; return; }
+  if (S === 0) { err.textContent = "Nessuno deve ricevere regali: imposta \"Regali da ricevere\"."; return; }
+  const nomi = p.map(x => x.nome.toLowerCase());
+  const doppio = nomi.find((x, i) => nomi.indexOf(x) !== i);
+  if (doppio) { err.textContent = `Il nome "${doppio}" compare due volte: aggiungi l'iniziale del cognome per distinguerli.`; return; }
+  // controllo chiaro: chi riceve k regali ha bisogno di almeno k persone diverse che possano farglieli
+  for (const [r, x] of p.entries()) {
+    const n = givers.filter(g => g !== x && !(state.escludiNucleo && g.nucleo === x.nucleo)).length;
+    if (x.riceve > n) {
+      err.textContent = `${x.nome} deve ricevere ${x.riceve} regali, ma solo ${n} persone possono farglieli` +
+        (state.escludiNucleo ? " (esclusi quelli del suo nucleo)" : "") + ". Riduci il numero o aggiungi chi fa regali.";
+      return;
+    }
+  }
+  if (state.risultati && !confirm("Esiste già un'estrazione. Rifare il sorteggio e sostituirla?")) return;
+  const coppie = sorteggia(p, state.escludiNucleo);
+  if (!coppie) {
+    err.textContent = "Non trovo un abbinamento con queste regole: troppi regali concentrati in un nucleo. Riduci i regali da ricevere, aggiungi chi fa regali o togli la regola sul nucleo.";
+    return;
+  }
+  state.risultati = p.map((x, i) => ({ i, x })).filter(o => o.x.fa).map(({ i, x }) => ({
+    da: x.nome, nucleo: x.nucleoNome, visibile: false,
+    a: coppie.filter(([g]) => g === i).map(([, r]) => p[r].nome),
+  }));
+  state.dataEstrazione = new Date().toLocaleString("it-IT");
+  save(); renderRisultati();
+  document.getElementById("secRisultati").scrollIntoView({ behavior: "smooth" });
+}
+
+function renderRisultati() {
+  const sec = document.getElementById("secRisultati");
+  if (!state.risultati) { sec.style.display = "none"; return; }
+  sec.style.display = "";
+  document.getElementById("infoEstrazione").textContent =
+    `Estrazione del ${state.dataEstrazione}` + (state.budget ? ` · Budget: ${state.budget} a regalo` : "") +
+    ". Ognuno può cliccare sul proprio nome per scoprire a chi fa i regali.";
+  document.getElementById("results").innerHTML = state.risultati.map((r, i) => `
+    <div class="pair" onclick="toggle(${i})" style="cursor:pointer">
+      <div class="giver">🎁 ${esc(r.da)}</div>
+      <div class="small">${esc(r.nucleo)} · ${r.a.length} regal${r.a.length === 1 ? "o" : "i"} da fare</div>
+      <div class="recv">${r.visibile
+        ? (r.a.length ? r.a.map(n => "→ " + esc(n)).join("<br>") : '<span class="hidden">nessun regalo da fare</span>')
+        : '<span class="hidden">clicca per scoprirlo</span>'}</div>
+    </div>`).join("");
+}
+
+function toggle(i) { state.risultati[i].visibile = !state.risultati[i].visibile; save(); renderRisultati(); }
+function toggleAll(v) {
+  if (v && !confirm("Mostrare tutti gli abbinamenti? Il segreto non sarà più tale per chi guarda lo schermo.")) return;
+  state.risultati.forEach(r => r.visibile = v); save(); renderRisultati();
+}
+function copia() {
+  const txt = state.risultati.map(r => `${r.da} → ${r.a.join(", ") || "nessuno"}`).join("\n");
+  navigator.clipboard.writeText(txt).then(() => alert("Elenco copiato negli appunti."));
+}
+
+load().then(s => { state = s; render(); });
+</script>
+</body>
+</html>
