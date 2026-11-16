@@ -61,3 +61,7 @@ Risultati in `dist/`: `Secret Santa - Mac.zip`, `Secret Santa - Windows.zip`, `S
 | `app/linux/installa.sh` | Aggiunge Secret Santa al menu delle applicazioni su Linux (file `.desktop` dell'utente). |
 | `app/icona/disegna.swift` | Disegna l'icona; `build.sh` ne ricava `.icns` per Mac e le risorse per Windows. |
 | `app/strumenti/winicon` | Piccolo generatore del file `.syso` che incorpora l'icona nell'eseguibile Windows. |
+
+## Licenza
+
+Rilasciato con licenza [MIT](LICENSE): puoi usarlo, modificarlo e ridistribuirlo liberamente, mantenendo l'nota di copyright.
