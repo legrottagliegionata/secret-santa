@@ -56,10 +56,22 @@ func main() {
 
 	a := &app{dirDati: dir, ultimoContatto: time.Now()}
 
-	ln, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", portaPreferita))
+	// SECRET_SANTA_PORTA serve per le prove: una copia di prova gira su un'altra porta e,
+	// se quella porta è occupata, si ferma invece di agganciarsi all'app vera già aperta.
+	porta0, prova := portaPreferita, false
+	if v := os.Getenv("SECRET_SANTA_PORTA"); v != "" {
+		if _, err := fmt.Sscan(v, &porta0); err != nil {
+			fatale("SECRET_SANTA_PORTA non valida: %q", v)
+		}
+		prova = true
+	}
+	ln, err := net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", porta0))
 	if err != nil {
+		if prova {
+			fatale("Porta di prova %d occupata: %v", porta0, err)
+		}
 		// probabilmente l'app è già aperta: in quel caso riapro solo la pagina
-		url := fmt.Sprintf("http://127.0.0.1:%d/", portaPreferita)
+		url := fmt.Sprintf("http://127.0.0.1:%d/", porta0)
 		if giaAperta(url) {
 			apriBrowser(url)
 			return

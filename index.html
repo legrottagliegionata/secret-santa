@@ -90,7 +90,6 @@
     <h2>2 · Regole</h2>
     <div class="opts">
       <label><input type="checkbox" id="optNucleo" checked onchange="save()"> Non fare regali a chi è nel proprio nucleo (coniuge, figli, genitori)</label>
-      <label>Budget per regalo: <input type="text" id="budget" style="width:120px" placeholder="es. 30 €" oninput="save()"></label>
     </div>
     <div class="row" style="margin-top:10px">
       <button class="primary" onclick="estrai()">🎲 Estrai gli abbinamenti</button>
@@ -135,7 +134,7 @@ function defaultState() {
         { id: uid(), nome: "", ruolo: "Figlio/a", partecipa: true, maxRegali: null, regali: REGALI_PER_RUOLO_DEFAULT["Figlio/a"] },
       ]},
     ],
-    escludiNucleo: true, budget: "", risultati: null, dataEstrazione: null,
+    escludiNucleo: true, risultati: null, dataEstrazione: null,
   };
 }
 
@@ -147,6 +146,7 @@ function migra(s) {
     if (m.maxRegali === undefined || m.maxRegali === "" || isNaN(m.maxRegali)) m.maxRegali = null;
   }));
   if (s.escludiNucleo === undefined) s.escludiNucleo = true;
+  delete s.budget; // campo non più usato
   s.regaliPerRuolo = Object.assign({}, REGALI_PER_RUOLO_DEFAULT, s.regaliPerRuolo || {});
   if (Array.isArray(s.risultati)) {
     s.risultati.forEach(r => { if (!Array.isArray(r.a)) r.a = r.a ? [r.a] : []; });
@@ -207,7 +207,6 @@ function importa(file) {
 function save() {
   if (window.__datiIllegibili) return; // non sovrascrivere dati che non sono riuscito a leggere
   state.escludiNucleo = document.getElementById("optNucleo").checked;
-  state.budget = document.getElementById("budget").value;
   if (APP) salvaSuFile(); else localStorage.setItem(KEY, JSON.stringify(state));
   aggiornaTotale();
 }
@@ -299,7 +298,6 @@ function render() {
     <label>${ETICHETTE_RUOLO[r]} <input type="number" min="0" max="20" value="${state.regaliPerRuolo[r]}"
       oninput="state.regaliPerRuolo['${r}'] = Math.max(0, parseInt(this.value) || 0); save()"></label>`).join("");
   document.getElementById("optNucleo").checked = state.escludiNucleo;
-  document.getElementById("budget").value = state.budget || "";
   aggiornaTotale();
   renderRisultati();
 }
@@ -521,7 +519,7 @@ function renderRisultati() {
   if (!state.risultati) { sec.style.display = "none"; return; }
   sec.style.display = "";
   document.getElementById("infoEstrazione").textContent =
-    `Estrazione del ${state.dataEstrazione}` + (state.budget ? ` · Budget: ${state.budget} a regalo` : "") +
+    `Estrazione del ${state.dataEstrazione}` +
     ". Ognuno può cliccare sul proprio nome per scoprire a chi fa i regali." +
     (state.nipotiBilanciati === false ? " ⚠️ Con queste regole non sono riuscito a dividere i nipoti in modo equo: prova a rifare l'estrazione." : "");
   document.getElementById("results").innerHTML = state.risultati.map((r, i) => `
