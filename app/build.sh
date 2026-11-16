@@ -30,7 +30,14 @@ fi
 mkdir -p web
 cp ../index.html web/index.html
 
-rm -rf "$DIST"
+# Cancello solo quello che crea la build: se qualcuno ha avviato l'app da dist/,
+# accanto ci sono i dati della famiglia (secret-santa-dati*.json) e devono restare.
+rm -rf "$APP" "$DIST/windows/SecretSanta.exe" \
+  "$DIST/linux-amd64/Secret Santa/secret-santa" "$DIST/linux-arm64/Secret Santa/secret-santa" \
+  "$DIST"/*.zip "$DIST"/*.tar.gz
+if find "$DIST" -name 'secret-santa-dati*.json' 2>/dev/null | grep -q .; then
+  echo "⚠️  In dist/ ci sono file di dati della famiglia: li lascio dove sono, ma è meglio tenere l'app altrove."
+fi
 mkdir -p "$DIST/windows" "$APP/Contents/MacOS" "$APP/Contents/Resources"
 
 LDFLAGS="-s -w"

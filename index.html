@@ -42,6 +42,11 @@
   .pair .recv { margin-top: 6px; font-size: 16px; color: var(--red); font-weight: 600; }
   .pair .hidden { color: var(--muted); font-style: italic; font-weight: normal; }
   .muted { color: var(--muted); font-size: 13px; }
+  .ruoli { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; background: #f6f2ea; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 14px; }
+  .ruoli label { display: inline-flex; gap: 6px; align-items: center; }
+  .ruoli input { width: 56px; padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; }
+  input:disabled { background: #f3f3f3; color: #aaa; }
+  .totale-err { color: var(--red); font-weight: 600; }
   @media print { header button, .noprint { display: none !important; } section { border: none; } }
 </style>
 </head>
@@ -60,7 +65,14 @@
     <h2>1 · La famiglia</h2>
     <p class="muted">Ogni <b>nucleo</b> è un fratello o una sorella con il proprio coniuge e i figli.
       <b>Fa regali</b>: spunta chi partecipa e deve fare i regali; gli altri li ricevono soltanto.
-      <b>Regali da ricevere</b>: quanti regali deve ricevere quella persona (0 = nessuno).</p>
+      <b>Regali da ricevere</b>: quanti regali deve ricevere quella persona (0 = nessuno).
+      <b>Max da fare</b>: per chi vuole o può fare meno regali (vuoto = nessun limite; i regali in più vanno agli altri).</p>
+    <div class="ruoli noprint">
+      <b>Regali per ruolo</b>
+      <span id="regaliPerRuolo"></span>
+      <button onclick="applicaRegaliPerRuolo()">Applica a tutti</button>
+      <span class="muted">imposta "Regali da ricevere" di tutti in base al ruolo; poi puoi cambiarlo persona per persona.</span>
+    </div>
     <div id="nuclei"></div>
     <div class="row noprint">
       <button onclick="addNucleo()">+ Aggiungi nucleo</button>
@@ -100,7 +112,10 @@
 </main>
 
 <script>
-const RUOLI = ["Fratello/Sorella", "Coniuge", "Figlio/a"];
+const RUOLI = ["Fratello/Sorella", "Coniuge", "Figlio/a", "Genitore"];
+const NIPOTI = "Figlio/a"; // i regali ai nipoti sono distribuiti in modo equo tra chi fa i regali
+const REGALI_PER_RUOLO_DEFAULT = { "Fratello/Sorella": 1, "Coniuge": 1, "Figlio/a": 2, "Genitore": 1 };
+const ETICHETTE_RUOLO = { "Fratello/Sorella": "Fratelli/sorelle", "Coniuge": "Coniugi", "Figlio/a": "Figli", "Genitore": "Genitori" };
 const KEY = "secret-santa-famiglia-v1";
 // Aperta dall'app (http://127.0.0.1) i dati stanno nel file JSON accanto all'app; aperta come file, nel browser.
 const APP = location.protocol.startsWith("http");
@@ -112,12 +127,12 @@ function defaultState() {
   return {
     nuclei: [
       { id: uid(), nome: "Nucleo 1", membri: [
-        { id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, regali: 2 },
+        { id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, maxRegali: null, regali: REGALI_PER_RUOLO_DEFAULT["Fratello/Sorella"] },
       ]},
       { id: uid(), nome: "Nucleo 2", membri: [
-        { id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, regali: 2 },
-        { id: uid(), nome: "", ruolo: "Coniuge", partecipa: true, regali: 2 },
-        { id: uid(), nome: "", ruolo: "Figlio/a", partecipa: true, regali: 2 },
+        { id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, maxRegali: null, regali: REGALI_PER_RUOLO_DEFAULT["Fratello/Sorella"] },
+        { id: uid(), nome: "", ruolo: "Coniuge", partecipa: true, maxRegali: null, regali: REGALI_PER_RUOLO_DEFAULT["Coniuge"] },
+        { id: uid(), nome: "", ruolo: "Figlio/a", partecipa: true, maxRegali: null, regali: REGALI_PER_RUOLO_DEFAULT["Figlio/a"] },
       ]},
     ],
     escludiNucleo: true, budget: "", risultati: null, dataEstrazione: null,
@@ -129,8 +144,10 @@ function migra(s) {
   s.nuclei.forEach(n => n.membri.forEach(m => {
     if (m.regali === undefined || m.regali === null || isNaN(m.regali)) m.regali = 1;
     if (m.partecipa === undefined) m.partecipa = true;
+    if (m.maxRegali === undefined || m.maxRegali === "" || isNaN(m.maxRegali)) m.maxRegali = null;
   }));
   if (s.escludiNucleo === undefined) s.escludiNucleo = true;
+  s.regaliPerRuolo = Object.assign({}, REGALI_PER_RUOLO_DEFAULT, s.regaliPerRuolo || {});
   if (Array.isArray(s.risultati)) {
     s.risultati.forEach(r => { if (!Array.isArray(r.a)) r.a = r.a ? [r.a] : []; });
   } else s.risultati = null;
@@ -250,7 +267,7 @@ function render() {
         <button class="icon danger noprint" title="Elimina nucleo" onclick="delNucleo('${n.id}')">🗑</button>
       </div>
       <table>
-        <thead><tr><th style="width:40%">Nome</th><th style="width:25%">Ruolo</th><th>Fa regali</th><th>Regali da ricevere</th><th></th></tr></thead>
+        <thead><tr><th style="width:34%">Nome</th><th style="width:22%">Ruolo</th><th>Fa regali</th><th>Max da fare</th><th>Regali da ricevere</th><th></th></tr></thead>
         <tbody>
           ${n.membri.map(m => `
             <tr>
@@ -260,7 +277,11 @@ function render() {
                 ${RUOLI.map(r => `<option ${r === m.ruolo ? "selected" : ""}>${r}</option>`).join("")}
               </select></td>
               <td><input type="checkbox" ${m.partecipa ? "checked" : ""}
-                         onchange="setMembro('${n.id}','${m.id}','partecipa',this.checked)"></td>
+                         onchange="setMembro('${n.id}','${m.id}','partecipa',this.checked); render()"></td>
+              <td><input type="number" min="1" max="50" step="1" value="${m.partecipa && m.maxRegali != null ? m.maxRegali : ""}"
+                         placeholder="${m.partecipa ? "—" : ""}" style="width:64px" ${m.partecipa ? "" : "disabled"}
+                         title="Quanti regali al massimo può fare (vuoto = nessun limite)"
+                         oninput="setMembro('${n.id}','${m.id}','maxRegali', this.value === '' ? null : Math.max(1, parseInt(this.value) || 1))"></td>
               <td><input type="number" min="0" max="20" step="1" value="${m.regali}" style="width:70px"
                          oninput="setMembro('${n.id}','${m.id}','regali',Math.max(0, parseInt(this.value) || 0))"></td>
               <td><button class="icon danger noprint" title="Rimuovi" onclick="delMembro('${n.id}','${m.id}')">✕</button></td>
@@ -270,9 +291,13 @@ function render() {
       <div class="row noprint" style="margin-top:6px">
         <button onclick="addMembro('${n.id}','Coniuge')">+ Coniuge</button>
         <button onclick="addMembro('${n.id}','Figlio/a')">+ Figlio/a</button>
+        <button onclick="addMembro('${n.id}','Genitore')">+ Genitore</button>
         <button onclick="addMembro('${n.id}','Fratello/Sorella')">+ Altro</button>
       </div>
     </div>`).join("");
+  document.getElementById("regaliPerRuolo").innerHTML = RUOLI.map(r => `
+    <label>${ETICHETTE_RUOLO[r]} <input type="number" min="0" max="20" value="${state.regaliPerRuolo[r]}"
+      oninput="state.regaliPerRuolo['${r}'] = Math.max(0, parseInt(this.value) || 0); save()"></label>`).join("");
   document.getElementById("optNucleo").checked = state.escludiNucleo;
   document.getElementById("budget").value = state.budget || "";
   aggiornaTotale();
@@ -288,13 +313,27 @@ function descriviNucleo(n) {
 
 function aggiornaTotale() {
   const p = persone();
-  const G = p.filter(x => x.fa).length, S = p.reduce((s, x) => s + x.riceve, 0);
-  let txt = `Totale: ${G} persone fanno regali, ${S} regali da ricevere`;
-  if (G > 0 && S > 0) {
-    const lo = Math.floor(S / G), hi = Math.ceil(S / G);
-    txt += ` → ognuno fa ${lo === hi ? lo : lo + " o " + hi} regal${hi === 1 ? "o" : "i"}`;
+  const givers = p.map((_, i) => i).filter(i => p[i].fa);
+  const S = p.reduce((s, x) => s + x.riceve, 0);
+  const K = p.filter(x => x.ruolo === NIPOTI).reduce((s, x) => s + x.riceve, 0);
+  let txt = `Totale: ${givers.length} persone fanno regali, ${S} regali da ricevere (${K} ai nipoti)`;
+  let errore = false;
+  if (givers.length > 0 && S > 0) {
+    const q = livelloQuote(p, givers, S);
+    if (q.errore) { txt += ` → ${q.errore}`; errore = true; }
+    else {
+      const liberi = givers.filter(g => p[g].max == null || p[g].max > q.L);
+      const conLimite = givers.filter(g => !liberi.includes(g)).map(g => `${p[g].nome} ${p[g].max}`);
+      const hi = q.L + (q.resto > 0 ? 1 : 0);
+      const parti = [];
+      if (conLimite.length) parti.push(`con un massimo: ${conLimite.join(", ")}`);
+      if (liberi.length) parti.push(`${conLimite.length ? "gli altri ne fanno" : "ognuno ne fa"} ${q.L === hi ? q.L : q.L + " o " + hi}`);
+      txt += " → " + parti.join("; ");
+    }
   }
-  document.getElementById("totale").textContent = txt;
+  const el = document.getElementById("totale");
+  el.textContent = txt;
+  el.className = errore ? "totale-err" : "muted";
   document.querySelectorAll(".nucleo").forEach((el, i) => {
     const n = state.nuclei[i];
     if (n) el.querySelector(".count").textContent = descriviNucleo(n);
@@ -306,7 +345,8 @@ function setNucleo(id, v) { findN(id).nome = v; save(); }
 function setMembro(nid, mid, k, v) { findN(nid).membri.find(m => m.id === mid)[k] = v; save(); }
 function addNucleo() {
   state.nuclei.push({ id: uid(), nome: `Nucleo ${state.nuclei.length + 1}`,
-    membri: [{ id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, regali: 2 }] });
+    membri: [{ id: uid(), nome: "", ruolo: "Fratello/Sorella", partecipa: true, maxRegali: null,
+               regali: state.regaliPerRuolo["Fratello/Sorella"] }] });
   save(); render();
 }
 function delNucleo(id) {
@@ -314,14 +354,27 @@ function delNucleo(id) {
   if (n.membri.some(m => m.nome.trim()) && !confirm(`Eliminare "${n.nome}" e tutti i suoi membri?`)) return;
   state.nuclei = state.nuclei.filter(x => x.id !== id); save(); render();
 }
-function addMembro(nid, ruolo) { findN(nid).membri.push({ id: uid(), nome: "", ruolo, partecipa: true, regali: 2 }); save(); render(); }
+function addMembro(nid, ruolo) {
+  findN(nid).membri.push({ id: uid(), nome: "", ruolo, partecipa: true, maxRegali: null,
+                           regali: state.regaliPerRuolo[ruolo] ?? 1 });
+  save(); render();
+}
+function applicaRegaliPerRuolo() {
+  const riepilogo = RUOLI.map(r => `${ETICHETTE_RUOLO[r]}: ${state.regaliPerRuolo[r]}`).join(", ");
+  if (!confirm(`Impostare "Regali da ricevere" di tutti in base al ruolo?\n${riepilogo}\n\nI valori cambiati a mano persona per persona verranno sostituiti.`)) return;
+  state.nuclei.forEach(n => n.membri.forEach(m => { m.regali = state.regaliPerRuolo[m.ruolo] ?? m.regali; }));
+  save(); render();
+}
 function delMembro(nid, mid) { const n = findN(nid); n.membri = n.membri.filter(m => m.id !== mid); save(); render(); }
 
 function persone() {
   const out = [];
   state.nuclei.forEach(n => n.membri.forEach(m => {
-    if (m.nome.trim()) out.push({ nome: m.nome.trim(), nucleo: n.id, nucleoNome: n.nome,
-                                  fa: !!m.partecipa, riceve: Math.max(0, parseInt(m.regali) || 0) });
+    if (m.nome.trim()) out.push({
+      nome: m.nome.trim(), nucleo: n.id, nucleoNome: n.nome, ruolo: m.ruolo,
+      fa: !!m.partecipa, riceve: Math.max(0, parseInt(m.regali) || 0),
+      max: m.partecipa && m.maxRegali != null ? Math.max(1, parseInt(m.maxRegali) || 1) : null,
+    });
   }));
   return out;
 }
@@ -336,44 +389,90 @@ function shuffle(a) {
   return a;
 }
 
-// Ogni regalo da ricevere è uno "slot". I regali sono divisi il più equamente possibile tra chi li fa:
-// nessuno fa un regalo a sé stesso, nessuno fa due regali alla stessa persona e, se richiesto,
-// nessuno fa regali al proprio nucleo. Ritorna una lista [giver, receiver] oppure null.
+// Quanti regali fa ognuno: il più possibile uguale per tutti, ma nessuno oltre il proprio massimo.
+// Ritorna il livello L (tutti fanno almeno min(max, L)) e quanti dei "liberi" ne fanno uno in più,
+// oppure un errore se i massimi non bastano a coprire tutti i regali.
+function livelloQuote(pers, givers, S) {
+  const lim = g => pers[g].max ?? Infinity;
+  const somma = L => givers.reduce((s, g) => s + Math.min(lim(g), L), 0);
+  if (somma(S) < S) {
+    return { errore: `con i massimi impostati si possono fare solo ${somma(S)} regali su ${S}: alza qualche massimo o riduci i regali da ricevere` };
+  }
+  let L = 0;
+  while (somma(L + 1) <= S) L++;
+  return { L, resto: S - somma(L) };
+}
+
+// Ripartisce K regali ai nipoti in proporzione ai regali che ognuno fa (metodo dei resti più grandi).
+function quoteNipoti(givers, cap, S, K) {
+  const q = {}, frazioni = [];
+  let assegnati = 0;
+  for (const g of givers) {
+    const ideale = S ? cap[g] * K / S : 0;
+    q[g] = Math.floor(ideale);
+    assegnati += q[g];
+    frazioni.push({ g, f: ideale - q[g], r: Math.random() });
+  }
+  frazioni.sort((a, b) => b.f - a.f || a.r - b.r);
+  for (let i = 0; i < K - assegnati; i++) q[frazioni[i].g]++;
+  return q;
+}
+
+// Ogni regalo da ricevere è uno "slot". Regole: nessuno fa un regalo a sé stesso, nessuno fa due regali
+// alla stessa persona, (se richiesto) nessuno fa regali al proprio nucleo, nessuno supera il proprio massimo.
+// I regali sono divisi il più equamente possibile e, se bilanciaNipoti, anche i nipoti lo sono:
+// ognuno ne riceve una quota proporzionale ai regali che fa. Ritorna { coppie, nipotiBilanciati } oppure null.
 function sorteggia(pers, escludiNucleo) {
   const givers = pers.map((_, i) => i).filter(i => pers[i].fa);
   const ok = (g, r) => g !== r && !(escludiNucleo && pers[g].nucleo === pers[r].nucleo);
-  const S = pers.reduce((s, x) => s + x.riceve, 0), G = givers.length;
+  const S = pers.reduce((s, x) => s + x.riceve, 0);
+  const K = pers.filter(x => x.ruolo === NIPOTI).reduce((s, x) => s + x.riceve, 0);
+  const q = livelloQuote(pers, givers, S);
+  if (q.errore) return null;
   const eleggibili = r => givers.filter(g => ok(g, r)).length;
 
-  for (let tentativo = 0; tentativo < 30; tentativo++) {
-    // capacità: tutti fanno floor(S/G) regali, alcuni a caso uno in più
-    const cap = new Array(pers.length).fill(0);
-    givers.forEach(g => cap[g] = Math.floor(S / G));
-    shuffle([...givers]).slice(0, S % G).forEach(g => cap[g]++);
+  const prova = (bilanciaNipoti) => {
+    // capacità: L per tutti (o il proprio massimo), e "resto" liberi a caso ne fanno uno in più
+    const cap = {};
+    givers.forEach(g => cap[g] = Math.min(pers[g].max ?? Infinity, q.L));
+    shuffle(givers.filter(g => (pers[g].max ?? Infinity) > q.L)).slice(0, q.resto).forEach(g => cap[g]++);
 
-    // slot ordinati dal destinatario più vincolato, a parità in ordine casuale
+    // due fasi: prima i nipoti con la loro quota, poi gli adulti con la capacità rimasta
+    const capN = {}, capA = {};
+    if (bilanciaNipoti) {
+      const qn = quoteNipoti(givers, cap, S, K);
+      givers.forEach(g => { capN[g] = qn[g]; capA[g] = cap[g] - qn[g]; });
+    }
+    const ordina = idx => shuffle(idx).sort((a, b) => eleggibili(a) - eleggibili(b));
     const slots = [];
-    shuffle(pers.map((_, i) => i))
-      .sort((a, b) => eleggibili(a) - eleggibili(b))
-      .forEach(r => { for (let k = 0; k < pers[r].riceve; k++) slots.push(r); });
+    const nipoti = pers.map((_, i) => i).filter(i => pers[i].ruolo === NIPOTI);
+    const adulti = pers.map((_, i) => i).filter(i => pers[i].ruolo !== NIPOTI);
+    const tutti = bilanciaNipoti ? [...ordina(nipoti), ...ordina(adulti)] : ordina(pers.map((_, i) => i));
+    tutti.forEach(r => { for (let k = 0; k < pers[r].riceve; k++) slots.push(r); });
 
+    const capDi = r => !bilanciaNipoti ? cap : pers[r].ruolo === NIPOTI ? capN : capA;
     const dato = new Set(), coppie = [];
     let passi = 0;
     const bt = k => {
       if (k === slots.length) return true;
       if (++passi > 50000) return false;
-      const r = slots[k];
-      for (const g of shuffle([...givers])) {
-        if (cap[g] > 0 && ok(g, r) && !dato.has(g + ">" + r)) {
-          cap[g]--; dato.add(g + ">" + r); coppie.push([g, r]);
+      const r = slots[k], c = capDi(r);
+      // prima chi ha più spazio libero, a parità a caso: meno vicoli ciechi
+      const candidati = shuffle([...givers]).sort((a, b) => c[b] - c[a]);
+      for (const g of candidati) {
+        if (c[g] > 0 && ok(g, r) && !dato.has(g + ">" + r)) {
+          c[g]--; dato.add(g + ">" + r); coppie.push([g, r]);
           if (bt(k + 1)) return true;
-          cap[g]++; dato.delete(g + ">" + r); coppie.pop();
+          c[g]++; dato.delete(g + ">" + r); coppie.pop();
         }
       }
       return false;
     };
-    if (bt(0)) return coppie;
-  }
+    return bt(0) ? coppie : null;
+  };
+
+  for (let t = 0; t < 40; t++) { const c = prova(true); if (c) return { coppie: c, nipotiBilanciati: true }; }
+  for (let t = 0; t < 20; t++) { const c = prova(false); if (c) return { coppie: c, nipotiBilanciati: false }; }
   return null;
 }
 
@@ -398,16 +497,20 @@ function estrai() {
       return;
     }
   }
+  const quote = livelloQuote(p, p.map((_, i) => i).filter(i => p[i].fa), S);
+  if (quote.errore) { err.textContent = "Non si può estrarre: " + quote.errore + "."; return; }
   if (state.risultati && !confirm("Esiste già un'estrazione. Rifare il sorteggio e sostituirla?")) return;
-  const coppie = sorteggia(p, state.escludiNucleo);
-  if (!coppie) {
-    err.textContent = "Non trovo un abbinamento con queste regole: troppi regali concentrati in un nucleo. Riduci i regali da ricevere, aggiungi chi fa regali o togli la regola sul nucleo.";
+  const esito = sorteggia(p, state.escludiNucleo);
+  if (!esito) {
+    err.textContent = "Non trovo un abbinamento con queste regole: troppi regali concentrati in un nucleo o massimi troppo bassi. Riduci i regali da ricevere, alza qualche massimo o togli la regola sul nucleo.";
     return;
   }
+  const { coppie, nipotiBilanciati } = esito;
   state.risultati = p.map((x, i) => ({ i, x })).filter(o => o.x.fa).map(({ i, x }) => ({
     da: x.nome, nucleo: x.nucleoNome, visibile: false,
     a: coppie.filter(([g]) => g === i).map(([, r]) => p[r].nome),
   }));
+  state.nipotiBilanciati = nipotiBilanciati;
   state.dataEstrazione = new Date().toLocaleString("it-IT");
   save(); renderRisultati();
   document.getElementById("secRisultati").scrollIntoView({ behavior: "smooth" });
@@ -419,7 +522,8 @@ function renderRisultati() {
   sec.style.display = "";
   document.getElementById("infoEstrazione").textContent =
     `Estrazione del ${state.dataEstrazione}` + (state.budget ? ` · Budget: ${state.budget} a regalo` : "") +
-    ". Ognuno può cliccare sul proprio nome per scoprire a chi fa i regali.";
+    ". Ognuno può cliccare sul proprio nome per scoprire a chi fa i regali." +
+    (state.nipotiBilanciati === false ? " ⚠️ Con queste regole non sono riuscito a dividere i nipoti in modo equo: prova a rifare l'estrazione." : "");
   document.getElementById("results").innerHTML = state.risultati.map((r, i) => `
     <div class="pair" onclick="toggle(${i})" style="cursor:pointer">
       <div class="giver">🎁 ${esc(r.da)}</div>
