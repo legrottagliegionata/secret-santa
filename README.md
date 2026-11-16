@@ -64,4 +64,4 @@ Risultati in `dist/`: `Secret Santa - Mac.zip`, `Secret Santa - Windows.zip`, `S
 
 ## Licenza
 
-Rilasciato con licenza [MIT](LICENSE): puoi usarlo, modificarlo e ridistribuirlo liberamente, mantenendo l'nota di copyright.
+Rilasciato con licenza [MIT](LICENSE): puoi usarlo, modificarlo e ridistribuirlo liberamente, mantenendo la nota di copyright.
